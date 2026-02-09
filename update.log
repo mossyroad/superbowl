@@ -105,3 +105,6 @@ SEA 12 - NE 0 | 9:12 - 3rd
 ✅ Pushed
 <stdin>:29: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
 SEA 12 - NE 0 | 9:12 - 3rd
+✅ Pushed
+<stdin>:29: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+SEA 12 - NE 0 | 9:12 - 3rd

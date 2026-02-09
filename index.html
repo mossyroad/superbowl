@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Bowl LX — Live Hub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --sea-green: #69BE28;
+            --sea-blue: #002244;
+            --ne-blue: #002244;
+            --ne-red: #C60C30;
+            --ne-silver: #B0B7BC;
+            --gold: #FFD700;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-effects {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-effects::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(105,190,40,0.15), transparent 70%);
+            top: -100px; left: -100px;
+            animation: float1 8s ease-in-out infinite;
+        }
+        .bg-effects::after {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(198,12,48,0.15), transparent 70%);
+            bottom: -100px; right: -100px;
+            animation: float2 10s ease-in-out infinite;
+        }
+        @keyframes float1 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(100px,80px); } }
+        @keyframes float2 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-80px,-100px); } }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0 20px;
+        }
+        .header .roman {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold), #FFA500, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 8px;
+            text-shadow: none;
+        }
+        .header .subtitle {
+            font-size: 1rem;
+            color: #888;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .header .venue {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 8px;
+        }
+        .live-badge {
+            display: inline-block;
+            background: #e00;
+            color: #fff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 12px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* Scoreboard */
+        .scoreboard {
+            background: linear-gradient(145deg, #151520, #1a1a2e);
+            border: 1px solid #2a2a3e;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .team {
+            flex: 1;
+            text-align: center;
+        }
+        .team-logo {
+            font-size: 3.5rem;
+            margin-bottom: 8px;
+        }
+        .team-name {
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .team-record {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 2px;
+        }
+        .score-center {
+            text-align: center;
+            min-width: 140px;
+        }
+        .scores {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+        .score-sea { color: var(--sea-green); }
+        .score-dash { color: #333; margin: 0 4px; }
+        .score-ne { color: var(--ne-red); }
+        .quarter {
+            font-size: 0.8rem;
+            color: var(--gold);
+            font-weight: 600;
+            margin-top: 4px;
+            letter-spacing: 2px;
+        }
+        .game-status {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        /* Quarter breakdown */
+        .quarter-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.85rem;
+        }
+        .quarter-table th, .quarter-table td {
+            padding: 10px 16px;
+            text-align: center;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        .quarter-table th {
+            color: #555;
+            font-weight: 400;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quarter-table .team-col { text-align: left; font-weight: 600; }
+
+        /* Info Cards */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .card {
+            background: linear-gradient(145deg, #151520, #1a1a2e);
+            border: 1px solid #2a2a3e;
+            border-radius: 16px;
+            padding: 24px;
+        }
+        .card h3 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #555;
+            margin-bottom: 12px;
+        }
+        .card p, .card li {
+            font-size: 0.9rem;
+            color: #ccc;
+            line-height: 1.7;
+        }
+        .card ul { list-style: none; }
+        .card ul li::before { content: '→ '; color: var(--gold); }
+
+        /* Headlines */
+        .headlines {
+            margin: 24px 0;
+        }
+        .headlines h2 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #555;
+            margin-bottom: 16px;
+        }
+        .headline-item {
+            background: linear-gradient(145deg, #151520, #1a1a2e);
+            border: 1px solid #2a2a3e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 12px;
+            transition: border-color 0.3s;
+        }
+        .headline-item:hover { border-color: var(--gold); }
+        .headline-item h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .headline-item p {
+            font-size: 0.85rem;
+            color: #888;
+            line-height: 1.5;
+        }
+        .headline-tag {
+            display: inline-block;
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .tag-storyline { background: #1a1a4e; color: #7b8cff; }
+        .tag-halftime { background: #2e1a2e; color: #ff7bbd; }
+        .tag-history { background: #1a2e1a; color: #7bffb0; }
+        .tag-betting { background: #2e2e1a; color: #ffd97b; }
+
+        /* Halftime */
+        .halftime-section {
+            background: linear-gradient(135deg, #1a0a2e, #2a1040);
+            border: 1px solid #3a2050;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .halftime-section .performer {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        .halftime-section .performer-note {
+            color: #a080c0;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        /* Key matchup */
+        .matchup-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #151520;
+            border-radius: 10px;
+            margin: 8px 0;
+        }
+        .matchup-bar .label { color: #888; font-size: 0.75rem; }
+        .matchup-bar .val { font-weight: 600; font-size: 0.9rem; }
+        .matchup-bar .val.green { color: var(--sea-green); }
+        .matchup-bar .val.red { color: var(--ne-red); }
+
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #333;
+            font-size: 0.75rem;
+        }
+        footer a { color: #555; }
+
+        @media (max-width: 600px) {
+            .header .roman { font-size: 3rem; }
+            .scores { font-size: 3rem; }
+            .scoreboard { flex-direction: column; gap: 16px; }
+            .team-logo { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-effects"></div>
+    <div class="container">
+        <div class="header">
+            <div class="roman">SUPER BOWL LX</div>
+            <div class="subtitle">February 8, 2026</div>
+            <div class="venue">Levi's Stadium · Santa Clara, California</div>
+            <div class="live-badge">🔴 Game Day</div>
+        </div>
+
+        <!-- Scoreboard -->
+        <div class="scoreboard">
+            <div class="team">
+                <div class="team-logo">🦅</div>
+                <div class="team-name" style="color: var(--sea-green);">Seahawks</div>
+                <div class="team-record">NFC #1 · 14-3</div>
+            </div>
+            <div class="score-center">
+                <div class="scores">
+                    <span class="score-sea">6</span>
+                    <span class="score-dash">-</span>
+                    <span class="score-ne">0</span>
+                </div>
+                <div class="quarter">Q2 · 5:50</div>
+                <div class="game-status">3rd & 5 at NE 42</div>
+            </div>
+            <div class="team">
+                <div class="team-logo">🏴‍☠️</div>
+                <div class="team-name" style="color: var(--ne-silver);">Patriots</div>
+                <div class="team-record">AFC #2 · 14-3</div>
+            </div>
+        </div>
+
+        <!-- Quarter Breakdown -->
+        <table class="quarter-table">
+            <thead>
+                <tr>
+                    <th class="team-col">Team</th>
+                    <th>Q1</th>
+                    <th>Q2</th>
+                    <th>Q3</th>
+                    <th>Q4</th>
+                    <th style="color:#fff;font-weight:600;">Final</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="team-col" style="color:var(--sea-green)">SEA</td>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td style="font-weight:700">6</td>
+                </tr>
+                <tr>
+                    <td class="team-col" style="color:var(--ne-red)">NE</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td style="font-weight:700">0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Halftime Show -->
+        <div class="halftime-section">
+            <h3 style="color:#a080c0;font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;">🎤 Halftime Show</h3>
+            <div class="performer">Bad Bunny</div>
+            <div class="performer-note">The first all-Spanish Super Bowl halftime performance</div>
+        </div>
+
+        <!-- Headlines -->
+        <div class="headlines">
+            <h2>📰 Headlines & Storylines</h2>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-storyline">Storyline</span>
+                <h3>The Rematch: 11 Years in the Making</h3>
+                <p>A rematch of Super Bowl XLIX from 2015 — when the Patriots famously intercepted the Seahawks at the goal line. Seattle has waited over a decade for this revenge opportunity. Will they finally get their redemption?</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-storyline">Comeback Story</span>
+                <h3>Patriots: From 4 Wins to Super Bowl</h3>
+                <p>New England went 4-13 last season. Under new head coach Mike Vrabel, they've surged to 14-3 and their first Super Bowl appearance since the Brady-Belichick era. It's one of the greatest turnarounds in NFL history.</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-history">History</span>
+                <h3>Patriots Seeking Record 7th Title</h3>
+                <p>A win would give New England a league-record seventh Lombardi Trophy, extending their record 12th Super Bowl appearance. The post-Brady era renaissance is real.</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-storyline">Key Player</span>
+                <h3>Jaxon Smith-Njigba: Offensive Player of the Year</h3>
+                <p>The Seahawks' WR led the league with 1,793 receiving yards, earning First-Team All-Pro and OPOY honors. He's the X-factor Seattle hopes will torch New England's secondary.</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-storyline">QB Battle</span>
+                <h3>Sam Darnold's Resurrection vs. Drake Maye's Rise</h3>
+                <p>Darnold — once considered a bust after years with the Jets — signed with Seattle and earned his second Pro Bowl nod (4,048 yards, 25 TDs). Maye is leading the Patriots' stunning rebuild as a second-year QB. Two unexpected stories collide.</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-betting">Odds</span>
+                <h3>Seahawks Favored by 4.5</h3>
+                <p>Vegas has Seattle as the favorites, but nobody's counting out a Patriots team that has defied every expectation this season.</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-halftime">Entertainment</span>
+                <h3>Charlie Puth Sings National Anthem</h3>
+                <p>Charlie Puth performed the Star-Spangled Banner with Joe Montana handling the coin toss at Levi's Stadium — the 49ers legend returning to his old stomping grounds.</p>
+            </div>
+
+            <div class="headline-item">
+                <span class="headline-tag tag-history">Defense</span>
+                <h3>Seattle's #1 Scoring Defense</h3>
+                <p>The Seahawks boast the league's top scoring defense, led by Leonard Williams, Byron Murphy II, Devon Witherspoon, and Ernest Jones (126 tackles, 5 INTs). A new Legion of Boom?</p>
+            </div>
+        </div>
+
+        <!-- Game Info Cards -->
+        <div class="cards">
+            <div class="card">
+                <h3>📺 How to Watch</h3>
+                <ul>
+                    <li>NBC (Mike Tirico & Cris Collinsworth)</li>
+                    <li>Streaming: Peacock, NFL+</li>
+                    <li>Spanish: Telemundo, Universo</li>
+                    <li>Radio: Westwood One (Kevin Harlan)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🏟️ The Venue</h3>
+                <p>Levi's Stadium, Santa Clara, CA — home of the San Francisco 49ers. Second Super Bowl here (first was Super Bowl 50 in 2016). Third Super Bowl in the Bay Area overall.</p>
+            </div>
+            <div class="card">
+                <h3>🦅 Seahawks Path</h3>
+                <ul>
+                    <li>Wild Card: BYE (NFC #1 seed)</li>
+                    <li>Divisional: Beat 49ers 41-6</li>
+                    <li>NFC Championship: Beat Rams 31-27</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🏴‍☠️ Patriots Path</h3>
+                <ul>
+                    <li>From 4-13 in 2024 to 14-3 in 2025</li>
+                    <li>Won AFC East after Bills loss to Eagles</li>
+                    <li>Coach Vrabel's "back to work" mentality</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>💰 By The Numbers</h3>
+                <ul>
+                    <li>30-sec commercial: $7-8 million</li>
+                    <li>Attendance: ~65,000+</li>
+                    <li>Referee: Shawn Smith</li>
+                    <li>Kickoff: 3:30 PM PT / 5:30 PM CT</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>🎲 Fun Facts</h3>
+                <ul>
+                    <li>Rematch of Super Bowl XLIX (Feb 2015)</li>
+                    <li>Pats seeking record 7th championship</li>
+                    <li>Seattle last won SB XLVIII (2014)</li>
+                    <li>Bad Bunny: first all-Spanish halftime</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built on Super Bowl Sunday by Filip & his AI 🏈</p>
+            <p style="margin-top:4px;">Score snapshot as of Q2. Not auto-updating.</p>
+        </footer>
+    </div>
+</body>
+</html>
